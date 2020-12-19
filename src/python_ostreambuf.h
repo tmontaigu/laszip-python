@@ -1,5 +1,5 @@
-#ifndef LASZIPY_PYTHON_OSTREAMBUF_H
-#define LASZIPY_PYTHON_OSTREAMBUF_H
+#ifndef LASZIP_BIND_PYTHON_OSTREAMBUF_H
+#define LASZIP_BIND_PYTHON_OSTREAMBUF_H
 
 #include <pybind11/pybind11.h>
 
@@ -106,4 +106,4 @@ class python_ostreambuf : public std::basic_streambuf<char>
     off_type m_pos_in_file;
 };
 
-#endif // LASZIPY_PYTHON_OSTREAMBUF_H
+#endif // LASZIP_BIND_PYTHON_OSTREAMBUF_H

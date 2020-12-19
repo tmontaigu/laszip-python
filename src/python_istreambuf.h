@@ -1,5 +1,5 @@
-#ifndef LASZIPY_PYTHON_ISTREAMBUF_H
-#define LASZIPY_PYTHON_ISTREAMBUF_H
+#ifndef LASZIP_BIND_PYTHON_ISTREAMBUF_H
+#define LASZIP_BIND_PYTHON_ISTREAMBUF_H
 
 #include <iosfwd>
 #include <pybind11/pybind11.h>
@@ -121,4 +121,4 @@ class python_istreambuf : public std::basic_streambuf<char>
     off_type m_pos_in_file;
 };
 
-#endif // LASZIPY_PYTHON_ISTREAMBUF_H
+#endif // LASZIP_BIND_PYTHON_ISTREAMBUF_H

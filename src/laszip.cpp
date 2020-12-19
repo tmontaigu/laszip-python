@@ -218,7 +218,7 @@ class LasZipDll
     std::unique_ptr<std::ostream> m_outputStream{nullptr};
 };
 
-PYBIND11_MODULE(laszipy, m)
+PYBIND11_MODULE(laszip, m)
 {
     py::register_exception<laszip_error>(m, "LaszipError");
 

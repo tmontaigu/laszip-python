@@ -124,13 +124,13 @@ class CMakeBuild(build_ext):
 
 
 setup(
-    name="laszipy",
+    name="laszip",
     version="0.0.1",
     author="Thomas Montaigu",
     author_email="thomas.montaigu@laposte.net",
     description="Bindings for LASzip made with pybind11",
     long_description="",
-    ext_modules=[CMakeExtension("laszipy")],
+    ext_modules=[CMakeExtension("laszip")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
 )

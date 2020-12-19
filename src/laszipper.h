@@ -1,5 +1,5 @@
-#ifndef LASZIPY_LASZIPPER_H
-#define LASZIPY_LASZIPPER_H
+#ifndef LASZIP_BIND_LASZIPPER_H
+#define LASZIP_BIND_LASZIPPER_H
 
 #include <sstream>
 
@@ -37,4 +37,4 @@ class LasZipper
     laszip_point *m_point{nullptr};
 };
 
-#endif // LASZIPY_LASZIPPER_H
+#endif // LASZIP_BIND_LASZIPPER_H

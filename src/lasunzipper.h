@@ -1,5 +1,5 @@
-#ifndef LASZIPY_LASUNZIPPER_H
-#define LASZIPY_LASUNZIPPER_H
+#ifndef LASZIP_BIND_LASUNZIPPER_H
+#define LASZIP_BIND_LASUNZIPPER_H
 
 #include "python_istreambuf.h"
 
@@ -35,4 +35,4 @@ class LasUnZipper
     laszip_header *m_header{nullptr};
     laszip_point *m_point{nullptr};
 };
-#endif // LASZIPY_LASUNZIPPER_H
+#endif // LASZIP_BIND_LASUNZIPPER_H
