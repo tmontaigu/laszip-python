@@ -14,7 +14,6 @@
 
 namespace py = pybind11;
 
-
 PYBIND11_MODULE(laszipy, m)
 {
 
@@ -33,15 +32,46 @@ PYBIND11_MODULE(laszipy, m)
         .def("done", &LasZipper::done);
 
     py::class_<laszip_header>(m, "LasZipHeader")
+        .def(py::init<>())
         .def_readwrite("file_source_ID", &laszip_header::file_source_ID)
         .def_readwrite("global_encoding", &laszip_header::global_encoding)
         .def_readwrite("project_ID_GUID_data_1", &laszip_header::project_ID_GUID_data_1)
         .def_readwrite("project_ID_GUID_data_2", &laszip_header::project_ID_GUID_data_2)
         .def_readwrite("project_ID_GUID_data_3", &laszip_header::project_ID_GUID_data_3)
-        //.def_readwrite("project_ID_GUID_data_4", &laszip_header::project_ID_GUID_data_4)
+        .def_property(
+            "project_ID_GUID_data_4",
+            [](const laszip_header &header) { return py::str(header.project_ID_GUID_data_4, 8); },
+            [](laszip_header &header, const std::string &new_value) {
+                if (new_value.size() != 8)
+                {
+                    throw std::invalid_argument("project_ID_GUID_data_4 must be 8 bytes long");
+                }
+                std::copy(new_value.begin(), new_value.end(), header.project_ID_GUID_data_4);
+            })
         .def_readwrite("version_major", &laszip_header::version_major)
         .def_readwrite("version_minor", &laszip_header::version_minor)
-        // systemident, gensoft
+        .def_property(
+            "system_identifier",
+            [](const laszip_header &header) { return py::str(header.system_identifier, 32); },
+            [](laszip_header &header, const std::string &new_value) {
+                if (new_value.size() > 32)
+                {
+                    throw std::invalid_argument("system_identifier cannot exceed 32 bytes");
+                }
+                std::fill(header.system_identifier, header.system_identifier + 32, '\0');
+                std::copy(new_value.begin(), new_value.end(), header.system_identifier);
+            })
+        .def_property(
+            "generating_software",
+            [](const laszip_header &header) { return py::str(header.generating_software, 32); },
+            [](laszip_header &header, const std::string &new_value) {
+                if (new_value.size() > 32)
+                {
+                    throw std::invalid_argument("generating_software cannot exceed 32 bytes");
+                }
+                std::fill(header.generating_software, header.generating_software + 32, '\0');
+                std::copy(new_value.begin(), new_value.end(), header.generating_software);
+            })
         .def_readwrite("file_creation_day", &laszip_header::file_creation_day)
         .def_readwrite("file_creation_year", &laszip_header::file_creation_year)
         .def_readwrite("header_size", &laszip_header::header_size)
@@ -50,7 +80,7 @@ PYBIND11_MODULE(laszipy, m)
         .def_readwrite("point_data_format", &laszip_header::point_data_format)
         .def_readwrite("point_data_record_length", &laszip_header::point_data_record_length)
         .def_readwrite("number_of_point_records", &laszip_header::number_of_point_records)
-        // pts by return
+        // TODO num pts by return
         .def_readwrite("x_scale_factor", &laszip_header::x_scale_factor)
         .def_readwrite("y_scale_factor", &laszip_header::y_scale_factor)
         .def_readwrite("z_scale_factor", &laszip_header::z_scale_factor)
@@ -72,8 +102,17 @@ PYBIND11_MODULE(laszipy, m)
         .def_readwrite("number_of_extended_variable_length_records",
                        &laszip_header::number_of_extended_variable_length_records)
         .def_readwrite("extended_number_of_point_records", &laszip_header::extended_number_of_point_records);
-    // extended points by ret
+    // TODO extended points by ret
+    //      vlrs
+    //      userdata in & afterheader
 
-    // vlrs
-    // userdata in & afterheader
+    m.def("get_version", []() {
+        laszip_U8 major{0}, minor{0};
+        laszip_U16 revision{0};
+        laszip_U32 build{0};
+
+        laszip_get_version(&major, &minor, &revision, &build);
+
+        return py::make_tuple(major, minor, revision, build);
+    });
 }
