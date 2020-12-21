@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.16)
 project(laszip-python)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -20,4 +20,12 @@ pybind11_add_module(laszip
 
 target_link_libraries(laszip PRIVATE ${LASZIP_LIBRARIES})
 target_include_directories(laszip PRIVATE ${LASZIP_INCLUDE_DIR})
+
+message(${LASZIP_LIBRARY})
+
+if (NOT WIN32)
+    add_custom_command(
+            TARGET laszip
+            POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${LASZIP_LIBRARY} $<TARGET_FILE_DIR:laszip>)
+endif()
 
