@@ -402,9 +402,7 @@ PYBIND11_MODULE(laszip, m)
         .def_property_readonly("extra_bytes",
                                [](const laszip_point &point) {
                                    return wrap_as_py_array(point.extra_bytes, point.num_extra_bytes);
-                               })
-
-        ;
+                               });
 
     m.def("get_version", []() {
         laszip_U8 major{0}, minor{0};
