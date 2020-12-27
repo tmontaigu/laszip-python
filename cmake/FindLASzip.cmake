@@ -22,6 +22,7 @@ IF (LASZIP_INCLUDE_DIR)
     # Already in cache, be silent
     SET(LASZIP_FIND_QUIETLY TRUE)
 ENDIF ()
+
 IF (WIN32)
     SET(OSGEO4W_IMPORT_LIBRARY laszip3)
     IF (DEFINED ENV{OSGEO4W_HOME})
@@ -29,20 +30,35 @@ IF (WIN32)
         SET(OSGEO4W_LIB_DIR $ENV{OSGEO4W_ROOT}/lib)
     ENDIF ()
 ENDIF ()
+
+if (DEFINED ENV{CONDA_PREFIX})
+    set(CONDA_INCLUDE_DIR $ENV{CONDA_PREFIX}/include)
+    if (WIN32)
+        set(CONDA_LIBRARY_DIR $ENV{CONDA_PREFIX}/Library/lib)
+    else()
+        set(CONDA_LIBRARY_DIR $ENV{CONDA_PREFIX}/lib)
+    endif()
+endif()
+
 FIND_PATH(LASZIP_INCLUDE_DIR
         laszip_api.h
         NAMES laszip
         PATHS
         /usr/include
         /usr/local/include
-        ${OSGEO4W_INCLUDE_DIR})
+        ${OSGEO4W_INCLUDE_DIR}
+        ${CONDA_INCLUDE_DIR})
+
 SET(LASZIP_NAMES ${OSGEO4W_IMPORT_LIBRARY} laszip)
+
 FIND_LIBRARY(LASZIP_LIBRARY
         NAMES ${LASZIP_NAMES}
         PATHS
         /usr/lib
         /usr/local/lib
-        ${OSGEO4W_LIB_DIR})
+        ${OSGEO4W_LIB_DIR}
+        ${CONDA_LIBRARY_DIR})
+
 # Comment out laszip.hpp version info
 SET(LASZIP_VERSION_H "${LASZIP_INCLUDE_DIR}/laszip/laszip_api_version.h")
 IF (LASZIP_INCLUDE_DIR AND EXISTS ${LASZIP_VERSION_H})
@@ -72,6 +88,7 @@ IF (LASZIP_INCLUDE_DIR AND EXISTS ${LASZIP_VERSION_H})
 ELSE ()
     return()
 ENDIF ()
+
 # Handle the QUIETLY and REQUIRED arguments and set LASZIP_FOUND to TRUE
 # if all listed variables are TRUE
 INCLUDE(FindPackageHandleStandardArgs)
