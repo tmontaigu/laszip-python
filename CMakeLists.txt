@@ -24,8 +24,11 @@ target_include_directories(laszip PRIVATE ${LASZIP_INCLUDE_DIR})
 message(${LASZIP_LIBRARY})
 
 if (NOT WIN32)
-    add_custom_command(
-            TARGET laszip
-            POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${LASZIP_LIBRARY} $<TARGET_FILE_DIR:laszip>)
+    option(COPY_LASZIP_LIB "Shall the the laszip lib be copied next to the python module" OFF)
+    if (COPY_LASZIP_LIB)
+        add_custom_command(
+                TARGET laszip
+                POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${LASZIP_LIBRARY} $<TARGET_FILE_DIR:laszip>)
+    endif()
 endif()
 
