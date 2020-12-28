@@ -63,3 +63,46 @@ jobs:
         with:
           name: "masOs-python${{ matrix.python-version }}"
           path: "./dist/*.whl"
+
+  Build-Windows-Wheels:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: [ 3.6, 3.7, 3.8, 3.9 ]
+
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+
+      - name: Print Python info
+        run: |
+          py -${{ matrix.python-version }} --version
+
+      - name: Install dependencies
+        run: |
+          vcpkg install laszip:x64-windows
+          py -${{ matrix.python-version }} -m pip install wheel pybind11 delocate
+
+      - name: Build Wheels
+        shell: pwsh
+        run: py -${{ matrix.python-version }} setup.py bdist_wheel `
+              -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+      - name: Test importing the wheel
+        run: |
+          vcpkg remove laszip:x64-windows
+          $whl_path=ls ./dist/*.whl | Select-Object -Index 0
+          py -${{ matrix.python-version }} -m pip install "$whl_path"
+          py -${{ matrix.python-version }} -c "import laszip"
+
+      - name: Upload wheel as artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: "windows-python${{ matrix.python-version }}"
+          path: "./dist/*.whl"
