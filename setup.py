@@ -125,7 +125,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name="laszip",
-    version="0.0.1",
+    version="0.1.0",
     author="Thomas Montaigu",
     author_email="thomas.montaigu@laposte.net",
     description="Bindings for LASzip made with pybind11",
