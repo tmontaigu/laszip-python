@@ -18,6 +18,8 @@ class LasUnZipper
 
     void decompress_into(py::buffer &buffer);
 
+    void seek(laszip_I64 index);
+
     const laszip_header& header() const;
 
     void close();

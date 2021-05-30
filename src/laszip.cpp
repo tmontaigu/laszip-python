@@ -14,6 +14,7 @@
 #include <iostream>
 
 namespace py = pybind11;
+using namespace pybind11::literals;
 
 void no_op_delete(void *) {}
 
@@ -223,9 +224,10 @@ PYBIND11_MODULE(laszip, m)
     py::register_exception<laszip_error>(m, "LaszipError");
 
     py::class_<LasUnZipper>(m, "LasUnZipper")
-        .def(py::init<py::object &>())
+        .def(py::init<py::object &>(), "file_object"_a)
         .def_property_readonly("header", &LasUnZipper::header)
-        .def("decompress_into", &LasUnZipper::decompress_into)
+        .def("decompress_into", &LasUnZipper::decompress_into, "buffer"_a)
+        .def("seek", &LasUnZipper::seek, "index"_a)
         .def("close", &LasUnZipper::close);
 
     py::class_<LasZipper>(m, "LasZipper")

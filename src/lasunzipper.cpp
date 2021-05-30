@@ -115,3 +115,10 @@ const laszip_header &LasUnZipper::header() const
     assert(m_header);
     return *m_header;
 }
+
+void LasUnZipper::seek(laszip_I64 index) {
+    if (laszip_seek_point(m_reader, index))
+    {
+        throw laszip_error::last_error(m_reader);
+    }
+}
