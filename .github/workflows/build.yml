@@ -46,7 +46,7 @@ jobs:
           python${{ matrix.python-version }} -m pip install wheel pybind11 delocate
 
       - name: Build Wheels
-        run: python${{ matrix.python-version }} setup.py bdist_wheel
+        run: python${{ matrix.python-version }} setup.py bdist_wheel -DCMAKE_OSX_DEPLOYMENT_TARGET="10.14"
 
       - name: Delocate wheels
         run: /bin/sh scripts/delocate-wheel.sh
