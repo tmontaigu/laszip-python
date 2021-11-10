@@ -56,9 +56,9 @@ void LasUnZipper::decompress_into(py::buffer &buffer)
         throw std::invalid_argument("Buffer must be one dimensional");
     }
 
-    ssize_t num_points = buf_info.size / static_cast<ssize_t>(m_header->point_data_record_length);
+    py::ssize_t num_points = buf_info.size / static_cast<py::ssize_t>(m_header->point_data_record_length);
 
-    for (ssize_t i = 0; i < num_points; ++i)
+    for (py::ssize_t i = 0; i < num_points; ++i)
     {
 
         if (laszip_read_point(m_reader))
