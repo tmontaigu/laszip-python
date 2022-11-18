@@ -9,7 +9,7 @@ The main purpose is for integration within [pylas][pylas-github].
 
 Building can be done using cmake or python's setup.py (which will just call cmake).
 
-First, laszip needs to be installed. You can install it via `vcpkg` or `conda` or other means.
+First, `laszip` and `pybind11` needs to be installed. You can install it via `vcpkg` or `conda` or other means.
 
 To help cmake find Laszip you may have to use `-DCMAKE_TOOLCHAIN_FILE=/some/path/vcpg.cmake`
 if you used vcpkg to install laszip, or `-DCMAKE_INCLUDE_PATH=...` and `-DCMAKE_LIBRARY_PATH=...`

@@ -1,38 +1,8 @@
-###############################################################################
-#
-# CMake module to search for LASzip library
-#
-# On success, the macro sets the following variables:
-# LASZIP_FOUND       = if the library found
-# LASZIP_LIBRARIES   = full path to the library
-# LASZIP_INCLUDE_DIR = where to find the library headers also defined,
-#                       but not for general use are
-# LASZIP_LIBRARY     = where to find the laszip library.
-# LASZIP_VERSION     = version of library which was found, e.g. "1.2.5"
-#
-# Copyright (c) 2009 Mateusz Loskot <mateusz@loskot.net>
-#
-# Module source: http://github.com/mloskot/workshop/tree/master/cmake/
-#
-# Redistribution and use is allowed according to the terms of the BSD license.
-# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
-#
-###############################################################################
-IF (LASZIP_INCLUDE_DIR)
-    # Already in cache, be silent
-    SET(LASZIP_FIND_QUIETLY TRUE)
-ENDIF ()
-
-IF (WIN32)
-    SET(OSGEO4W_IMPORT_LIBRARY laszip3)
-    IF (DEFINED ENV{OSGEO4W_HOME})
-        SET(OSGEO4W_INCLUDE_DIR $ENV{OSGEO4W_ROOT}/include)
-        SET(OSGEO4W_LIB_DIR $ENV{OSGEO4W_ROOT}/lib)
-    ENDIF ()
-ENDIF ()
+include(FindPackageHandleStandardArgs)
+# TODO laszip_api && laszip version from header
 
 if (DEFINED ENV{CONDA_PREFIX})
-    set(CONDA_INCLUDE_DIR $ENV{CONDA_PREFIX}/include)
+    set(CONDA_INCLUDE_DIR $ENV{CONDA_PREFIX}/Library/include)
     if (WIN32)
         set(CONDA_LIBRARY_DIR $ENV{CONDA_PREFIX}/Library/lib)
     else()
@@ -40,59 +10,51 @@ if (DEFINED ENV{CONDA_PREFIX})
     endif()
 endif()
 
-FIND_PATH(LASZIP_INCLUDE_DIR
-        laszip_api.h
-        NAMES laszip
-        PATHS
-        /usr/include
-        /usr/local/include
-        ${OSGEO4W_INCLUDE_DIR}
-        ${CONDA_INCLUDE_DIR})
-
-SET(LASZIP_NAMES ${OSGEO4W_IMPORT_LIBRARY} laszip)
-
-FIND_LIBRARY(LASZIP_LIBRARY
-        NAMES ${LASZIP_NAMES}
-        PATHS
-        /usr/lib
+find_library(LASZIP_LIBRARY
+        NAMES laszip3 laszip
+        HINTS /usr/lib
         /usr/local/lib
-        ${OSGEO4W_LIB_DIR}
-        ${CONDA_LIBRARY_DIR})
+        "${CONDA_LIBRARY_DIR}"
+        )
 
-# Comment out laszip.hpp version info
-SET(LASZIP_VERSION_H "${LASZIP_INCLUDE_DIR}/laszip/laszip_api_version.h")
-IF (LASZIP_INCLUDE_DIR AND EXISTS ${LASZIP_VERSION_H})
-    SET(LASZIP_VERSION 0)
-    FILE(READ ${LASZIP_VERSION_H} LASZIP_VERSION_H_CONTENTS)
-    IF (DEFINED LASZIP_VERSION_H_CONTENTS)
-        string(REGEX REPLACE ".*#define[ \t]LASZIP_API_VERSION_MAJOR[ \t]+([0-9]+).*" "\\1" LASZIP_VERSION_MAJOR "${LASZIP_VERSION_H_CONTENTS}")
-        string(REGEX REPLACE ".*#define[ \t]LASZIP_API_VERSION_MINOR[ \t]+([0-9]+).*" "\\1" LASZIP_VERSION_MINOR "${LASZIP_VERSION_H_CONTENTS}")
-        string(REGEX REPLACE ".*#define[ \t]LASZIP_API_VERSION_PATCH[ \t]+([0-9]+).*" "\\1" LASZIP_VERSION_PATCH "${LASZIP_VERSION_H_CONTENTS}")
-        if (NOT "${LASZIP_VERSION_MAJOR}" MATCHES "^[0-9]+$")
-            message(FATAL_ERROR "LASzip version parsing failed for \"LASZIP_API_VERSION_MAJOR\"")
-        endif ()
-        if (NOT "${LASZIP_VERSION_MINOR}" MATCHES "^[0-9]+$")
-            message(FATAL_ERROR "LASzip version parsing failed for \"LASZIP_VERSION_MINOR\"")
-        endif ()
-        if (NOT "${LASZIP_VERSION_PATCH}" MATCHES "^[0-9]+$")
-            message(FATAL_ERROR "LASzip version parsing failed for \"LASZIP_VERSION_PATCH\"")
-        endif ()
-        SET(LASZIP_VERSION "${LASZIP_VERSION_MAJOR}.${LASZIP_VERSION_MINOR}.${LASZIP_VERSION_PATCH}"
-                CACHE INTERNAL "The version string for LASzip library")
-        IF (LASZIP_VERSION VERSION_LESS LASzip_FIND_VERSION)
-            MESSAGE(FATAL_ERROR "LASzip version check failed. Version ${LASZIP_VERSION} was found, at least version ${LASzip_FIND_VERSION} is required")
-        ENDIF ()
-    ELSE ()
-        MESSAGE(FATAL_ERROR "Failed to open ${LASZIP_VERSION_H} file")
-    ENDIF ()
-ELSE ()
-    return()
-ENDIF ()
+find_path(LASZIP_INCLUDE_DIR
+        NAMES laszip
+        HINTS /usr/include
+        /usr/local/include
+        "${CONDA_INCLUDE_DIR}"
+        )
 
-# Handle the QUIETLY and REQUIRED arguments and set LASZIP_FOUND to TRUE
-# if all listed variables are TRUE
-INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(LASzip DEFAULT_MSG LASZIP_LIBRARY LASZIP_INCLUDE_DIR)
-IF (LASZIP_FOUND)
-    SET(LASZIP_LIBRARIES ${LASZIP_LIBRARY})
-ENDIF ()
+if (WIN32)
+    find_file(LASZIP_DLL
+            NAMES laszip3.dll
+            HINTS "${LASZIP_INCLUDE_DIR}/../bin"
+            )
+else ()
+    set(LASZIP_DLL "Dummy Value so that handle args does not fail")
+endif ()
+
+message(DEBUG "LASZIP_LIBRARY: ${LASZIP_LIBRARY}")
+message(DEBUG "LASZIP_DLL: ${LASZIP_DLL}")
+
+find_package_handle_standard_args(LASzip
+        REQUIRED_VARS LASZIP_LIBRARY LASZIP_INCLUDE_DIR LASZIP_DLL
+        HANDLE_COMPONENTS
+        )
+
+if (LASzip_FOUND)
+    mark_as_advanced(LASZIP_LIBRARY LASZIP_INCLUDE_DIR)
+endif ()
+
+if (LASzip_FOUND AND NOT TARGET LASzip::LASzip)
+    add_library(LASzip::LASzip SHARED IMPORTED)
+    if (WIN32)
+        set_target_properties(LASzip::LASzip PROPERTIES
+                IMPORTED_LOCATION ${LASZIP_DLL}
+                IMPORTED_IMPLIB ${LASZIP_LIBRARY}
+                )
+    else ()
+        set_target_properties(LASzip::LASzip PROPERTIES
+                IMPORTED_LOCATION ${LASZIP_LIBRARY})
+    endif ()
+    target_include_directories(LASzip::LASzip INTERFACE ${LASZIP_INCLUDE_DIR})
+endif ()
