@@ -3,12 +3,10 @@
 #include "laszip_error.h"
 
 LasZipper::LasZipper(py::object &file_obj, py::bytes &header_bytes)
-    : m_input_stream(), m_b(file_obj), m_output_stream(&m_b)
+    : m_is(), m_b(file_obj), m_output_stream(&m_b)
 {
     // TODO avoid this copy
     std::string data(header_bytes);
-    m_input_stream.write(data.data(), data.size());
-
     m_is.write(data.data(), data.size());
 
     if (laszip_create(&m_reader))

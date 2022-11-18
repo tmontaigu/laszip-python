@@ -23,8 +23,6 @@ class LasZipper
     const laszip_header& header() const;
 
   private:
-    std::stringstream m_input_stream;
-
     python_ostreambuf m_b;
     std::ostream m_output_stream;
 
