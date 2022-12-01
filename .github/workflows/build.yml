@@ -24,6 +24,25 @@ jobs:
           name: "manylinux-wheels"
           path: "./wheelhouse/*manylinux*.whl"
 
+  Build-ManyLinux-Arm64-Wheels:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Build Wheel
+        run: docker run --rm -v `pwd`:/io --platform linux/arm64 -e PLAT=manylinux2014_aarch64 quay.io/pypa/manylinux2014_aarch64 /bin/sh /io/scripts/build-wheels-linux.sh
+
+      - name: Upload wheels as artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: "manylinux-Arm64-wheels"
+          path: "./wheelhouse/*manylinux*.whl"
+
   Build-MacOs-Wheels:
     runs-on: macos-latest
     strategy:
