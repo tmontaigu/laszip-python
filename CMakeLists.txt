@@ -20,4 +20,7 @@ pybind11_add_module(laszip
 
 target_link_libraries(laszip PRIVATE LASzip::LASzip)
 
-
+install(TARGETS laszip DESTINATION laszip)
+if (WIN32)
+    install(FILES ${LASZIP_DLL} DESTINATION laszip)
+endif()

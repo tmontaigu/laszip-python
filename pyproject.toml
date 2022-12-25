@@ -1,9 +1,18 @@
 [build-system]
 requires = [
-    "ninja; sys_platform != 'win32'",
-    "setuptools>=42",
-    "wheel",
-    "cmake>=3.12",
-    "pybind11"
+    "scikit-build-core>=0.1.5",
+    "cmake>=3.20",
+    "ninja",
+    "pybind11>=2.10",
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "laszip"
+version = "0.1.0"
+description = "Bindings for LASzip made with pybind11"
+readme = "Readme.md"
+authors = [
+    { name = "Thomas Montaigu", email = "thomas.montaigu@laposte.net" }
+]
+requires-python = ">= 3.7"

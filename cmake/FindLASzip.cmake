@@ -1,6 +1,8 @@
 include(FindPackageHandleStandardArgs)
 # TODO laszip_api && laszip version from header
 
+message(FATALL_ERROR "toolchain: ${CMAKE_TOOLCHAIN_FILE}")
+
 if (DEFINED ENV{CONDA_PREFIX})
     set(CONDA_INCLUDE_DIR $ENV{CONDA_PREFIX}/Library/include)
     if (WIN32)

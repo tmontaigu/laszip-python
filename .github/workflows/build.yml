@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build Wheel
-        run: docker run --rm -v `pwd`:/io -e PLAT=manylinux2014_x86_64 quay.io/pypa/manylinux2014_x86_64 /bin/sh /io/scripts/build-wheels-linux.sh
+        run: docker run --rm -v `pwd`:/laszip-python -e PLAT=manylinux2014_x86_64 quay.io/pypa/manylinux2014_x86_64 /bin/sh /laszip-python/scripts/build-wheels-linux.sh
 
       - name: Upload wheels as artifacts
         uses: actions/upload-artifact@v2
@@ -35,12 +35,12 @@ jobs:
         uses: docker/setup-qemu-action@v1
 
       - name: Build Wheel
-        run: docker run --rm -v `pwd`:/io --platform linux/arm64 -e PLAT=manylinux2014_aarch64 quay.io/pypa/manylinux2014_aarch64 /bin/sh /io/scripts/build-wheels-linux.sh
+        run: docker run --rm -v `pwd`:/laszip-python --platform linux/arm64 -e PLAT=manylinux2014_aarch64 quay.io/pypa/manylinux2014_aarch64 /bin/sh /laszip-python/scripts/build-wheels-linux.sh
 
       - name: Upload wheels as artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: "manylinux-Arm64-wheels"
+          name: "manylinux-arm64-wheels"
           path: "./wheelhouse/*manylinux*.whl"
 
   Build-MacOs-Wheels:
@@ -67,10 +67,13 @@ jobs:
       - name: Install dependencies (macos)
         run: |
           brew install laszip ninja
-          python${{ matrix.python-version }} -m pip install wheel pybind11 delocate
+          python${{ matrix.python-version }} -m pip install --upgrade pip
+          python${{ matrix.python-version }} -m pip install delocate
 
       - name: Build Wheels
-        run: python${{ matrix.python-version }} setup.py bdist_wheel -DCMAKE_OSX_DEPLOYMENT_TARGET="10.14"
+        run: python${{ matrix.python-version }} -m pip wheel --wheel-dir dist .
+        env:
+            SKBUILD_CMAKE_ARGS: "-DCMAKE_OSX_DEPLOYMENT_TARGET=10.14"
 
       - name: Delocate wheels
         run: /bin/sh scripts/delocate-wheel.sh
@@ -111,12 +114,14 @@ jobs:
       - name: Install dependencies
         run: |
           vcpkg install laszip:x64-windows
-          py -${{ matrix.python-version }} -m pip install wheel pybind11 delocate
+          py -${{ matrix.python-version }} -m pip install --upgrade pip
 
       - name: Build Wheels
         shell: pwsh
-        run: py -${{ matrix.python-version }} setup.py bdist_wheel `
-              -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+        run: |
+            py -${{ matrix.python-version }} -m pip wheel --wheel-dir dist .`
+        env:
+            SKBUILD_CMAKE_ARGS: "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
       - name: Test importing the wheel
         run: |
