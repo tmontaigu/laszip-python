@@ -16,11 +16,13 @@ class LasUnZipper
   public:
     explicit LasUnZipper(py::object &file_obj);
 
+    LasUnZipper(py::object &file_obj, laszip_U32 decompression_selection);
+
     void decompress_into(py::buffer &buffer);
 
     void seek(laszip_I64 index);
 
-    const laszip_header& header() const;
+    const laszip_header &header() const;
 
     void close();
 

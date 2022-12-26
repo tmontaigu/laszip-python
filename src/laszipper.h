@@ -20,7 +20,7 @@ class LasZipper
 
     ~LasZipper();
 
-    const laszip_header& header() const;
+    const laszip_header &header() const;
 
   private:
     python_ostreambuf m_b;

@@ -1,4 +1,8 @@
-# 0.1.0
+# Unreleased
+
+- Added support for selective decompression
+
+# 0.1.0 30 May 2021
 
 - Added `seek` method to LasUnZipper
 

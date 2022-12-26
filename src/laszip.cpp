@@ -223,8 +223,33 @@ PYBIND11_MODULE(laszip, m)
 {
     py::register_exception<laszip_error>(m, "LaszipError");
 
+    m.attr("DECOMPRESS_SELECTIVE_ALL") = laszip_DECOMPRESS_SELECTIVE_ALL;
+
+    m.attr("DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY") = laszip_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY;
+    m.attr("DECOMPRESS_SELECTIVE_Z") = laszip_DECOMPRESS_SELECTIVE_Z;
+    m.attr("DECOMPRESS_SELECTIVE_CLASSIFICATION") = laszip_DECOMPRESS_SELECTIVE_CLASSIFICATION;
+    m.attr("DECOMPRESS_SELECTIVE_FLAGS") = laszip_DECOMPRESS_SELECTIVE_FLAGS;
+    m.attr("DECOMPRESS_SELECTIVE_INTENSITY") = laszip_DECOMPRESS_SELECTIVE_INTENSITY;
+    m.attr("DECOMPRESS_SELECTIVE_SCAN_ANGLE") = laszip_DECOMPRESS_SELECTIVE_SCAN_ANGLE;
+    m.attr("DECOMPRESS_SELECTIVE_USER_DATA") = laszip_DECOMPRESS_SELECTIVE_USER_DATA;
+    m.attr("DECOMPRESS_SELECTIVE_POINT_SOURCE") = laszip_DECOMPRESS_SELECTIVE_POINT_SOURCE;
+    m.attr("DECOMPRESS_SELECTIVE_GPS_TIME") = laszip_DECOMPRESS_SELECTIVE_GPS_TIME;
+    m.attr("DECOMPRESS_SELECTIVE_RGB") = laszip_DECOMPRESS_SELECTIVE_RGB;
+    m.attr("DECOMPRESS_SELECTIVE_NIR") = laszip_DECOMPRESS_SELECTIVE_NIR;
+    m.attr("DECOMPRESS_SELECTIVE_WAVEPACKET") = laszip_DECOMPRESS_SELECTIVE_WAVEPACKET;
+    m.attr("DECOMPRESS_SELECTIVE_BYTE0") = laszip_DECOMPRESS_SELECTIVE_BYTE0;
+    m.attr("DECOMPRESS_SELECTIVE_BYTE1") = laszip_DECOMPRESS_SELECTIVE_BYTE1;
+    m.attr("DECOMPRESS_SELECTIVE_BYTE2") = laszip_DECOMPRESS_SELECTIVE_BYTE2;
+    m.attr("DECOMPRESS_SELECTIVE_BYTE3") = laszip_DECOMPRESS_SELECTIVE_BYTE3;
+    m.attr("DECOMPRESS_SELECTIVE_BYTE4") = laszip_DECOMPRESS_SELECTIVE_BYTE4;
+    m.attr("DECOMPRESS_SELECTIVE_BYTE5") = laszip_DECOMPRESS_SELECTIVE_BYTE5;
+    m.attr("DECOMPRESS_SELECTIVE_BYTE6") = laszip_DECOMPRESS_SELECTIVE_BYTE6;
+    m.attr("DECOMPRESS_SELECTIVE_BYTE7") = laszip_DECOMPRESS_SELECTIVE_BYTE7;
+    m.attr("DECOMPRESS_SELECTIVE_EXTRA_BYTES") = laszip_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
+
     py::class_<LasUnZipper>(m, "LasUnZipper")
         .def(py::init<py::object &>(), "file_object"_a)
+        .def(py::init<py::object &, laszip_U32>(), "file_object"_a, "decompression_selection"_a)
         .def_property_readonly("header", &LasUnZipper::header)
         .def("decompress_into", &LasUnZipper::decompress_into, "buffer"_a)
         .def("seek", &LasUnZipper::seek, "index"_a)
@@ -401,10 +426,9 @@ PYBIND11_MODULE(laszip, m)
                                [](const laszip_point &point) { return wrap_as_py_array(point.rgb, 4); })
         .def_property_readonly(
             "wave_packet", [](const laszip_point &point) { return wrap_as_py_array(point.wave_packet, 4); })
-        .def_property_readonly("extra_bytes",
-                               [](const laszip_point &point) {
-                                   return wrap_as_py_array(point.extra_bytes, point.num_extra_bytes);
-                               });
+        .def_property_readonly("extra_bytes", [](const laszip_point &point) {
+            return wrap_as_py_array(point.extra_bytes, point.num_extra_bytes);
+        });
 
     m.def("get_version", []() {
         laszip_U8 major{0}, minor{0};

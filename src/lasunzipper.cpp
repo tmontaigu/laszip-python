@@ -1,5 +1,6 @@
 #include "lasunzipper.h"
 #include "laszip_error.h"
+#include <laszip/laszip_api.h>
 
 LasUnZipper::LasUnZipper(py::object &file_obj) : m_ibuf(file_obj), m_input_stream(&m_ibuf)
 {
@@ -40,6 +41,15 @@ LasUnZipper::LasUnZipper(py::object &file_obj) : m_ibuf(file_obj), m_input_strea
     {
         throw laszip_error::last_error(m_writer);
     }
+}
+
+LasUnZipper::LasUnZipper(py::object &file_obj, laszip_U32 decompression_selection) : LasUnZipper(file_obj)
+{
+
+    if (laszip_decompress_selective(m_reader, decompression_selection))
+    {
+        throw laszip_error::last_error(m_reader);
+    };
 }
 
 void LasUnZipper::decompress_into(py::buffer &buffer)
@@ -116,7 +126,8 @@ const laszip_header &LasUnZipper::header() const
     return *m_header;
 }
 
-void LasUnZipper::seek(laszip_I64 index) {
+void LasUnZipper::seek(laszip_I64 index)
+{
     if (laszip_seek_point(m_reader, index))
     {
         throw laszip_error::last_error(m_reader);
