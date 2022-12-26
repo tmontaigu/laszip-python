@@ -2,13 +2,21 @@
 #include "laszip_error.h"
 #include <laszip/laszip_api.h>
 
-LasUnZipper::LasUnZipper(py::object &file_obj) : m_ibuf(file_obj), m_input_stream(&m_ibuf)
+LasUnZipper::LasUnZipper(py::object &file_obj) : LasUnZipper(file_obj, laszip_DECOMPRESS_SELECTIVE_ALL) {}
+
+LasUnZipper::LasUnZipper(py::object &file_obj, laszip_U32 decompression_selection)
+    : m_ibuf(file_obj), m_input_stream(&m_ibuf)
 {
     laszip_BOOL is_compressed;
     if (laszip_create(&m_reader))
     {
         throw laszip_error("Failed to create the reader");
     }
+
+    if (laszip_decompress_selective(m_reader, decompression_selection))
+    {
+        throw laszip_error::last_error(m_reader);
+    };
 
     if (laszip_open_reader_stream(m_reader, m_input_stream, &is_compressed))
     {
@@ -41,15 +49,6 @@ LasUnZipper::LasUnZipper(py::object &file_obj) : m_ibuf(file_obj), m_input_strea
     {
         throw laszip_error::last_error(m_writer);
     }
-}
-
-LasUnZipper::LasUnZipper(py::object &file_obj, laszip_U32 decompression_selection) : LasUnZipper(file_obj)
-{
-
-    if (laszip_decompress_selective(m_reader, decompression_selection))
-    {
-        throw laszip_error::last_error(m_reader);
-    };
 }
 
 void LasUnZipper::decompress_into(py::buffer &buffer)

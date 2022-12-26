@@ -246,6 +246,7 @@ PYBIND11_MODULE(laszip, m)
     m.attr("DECOMPRESS_SELECTIVE_BYTE6") = laszip_DECOMPRESS_SELECTIVE_BYTE6;
     m.attr("DECOMPRESS_SELECTIVE_BYTE7") = laszip_DECOMPRESS_SELECTIVE_BYTE7;
     m.attr("DECOMPRESS_SELECTIVE_EXTRA_BYTES") = laszip_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
+    m.attr("DECOMPRESS_SELECTIVE_ALL") = laszip_DECOMPRESS_SELECTIVE_ALL;
 
     py::class_<LasUnZipper>(m, "LasUnZipper")
         .def(py::init<py::object &>(), "file_object"_a)
