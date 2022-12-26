@@ -1,3 +1,7 @@
+# 0.2.1 26 Dec 2022
+
+- Fixed selective decompressor constructor
+
 # 0.2.0 26 Dec 2022
 
 - Added support for selective decompression
