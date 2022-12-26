@@ -1,4 +1,4 @@
-# Unreleased
+# 0.2.0 26 Dec 2022
 
 - Added support for selective decompression
 

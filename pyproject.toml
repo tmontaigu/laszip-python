@@ -9,7 +9,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "laszip"
-version = "0.1.0"
+version = "0.2.0"
 description = "Bindings for LASzip made with pybind11"
 readme = "Readme.md"
 authors = [
