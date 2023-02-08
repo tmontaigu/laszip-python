@@ -1,3 +1,7 @@
+# 0.2.2 8 Feb 2023
+
+- Added missing MIT License
+
 # 0.2.1 26 Dec 2022
 
 - Fixed selective decompressor constructor
