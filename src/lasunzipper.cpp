@@ -2,6 +2,8 @@
 #include "laszip_error.h"
 #include <laszip/laszip_api.h>
 
+#include <algorithm>
+
 LasUnZipper::LasUnZipper(py::object &file_obj) : LasUnZipper(file_obj, laszip_DECOMPRESS_SELECTIVE_ALL) {}
 
 LasUnZipper::LasUnZipper(py::object &file_obj, laszip_U32 decompression_selection)
@@ -53,6 +55,12 @@ LasUnZipper::LasUnZipper(py::object &file_obj, laszip_U32 decompression_selectio
 
 void LasUnZipper::decompress_into(py::buffer &buffer)
 {
+
+    if (m_header->point_data_record_length == 0)
+    {
+        return;
+    }
+
     py::buffer_info buf_info = buffer.request();
 
     if (buf_info.itemsize != sizeof(char))
@@ -65,29 +73,43 @@ void LasUnZipper::decompress_into(py::buffer &buffer)
         throw std::invalid_argument("Buffer must be one dimensional");
     }
 
-    py::ssize_t num_points = buf_info.size / static_cast<py::ssize_t>(m_header->point_data_record_length);
+    size_t num_points_to_read = buf_info.size / static_cast<py::ssize_t>(m_header->point_data_record_length);
 
-    for (py::ssize_t i = 0; i < num_points; ++i)
+    // How many bytes the `m_output_stream` can store
+    size_t max_bytes_in_output_stream = std::numeric_limits<std::stringstream::int_type>::max();
+    size_t max_points_before_filling_stream =
+        max_bytes_in_output_stream / static_cast<size_t>(m_header->point_data_record_length);
+
+    auto *out_ptr = static_cast<char *>(buf_info.ptr);
+    while (num_points_to_read != 0)
     {
-
-        if (laszip_read_point(m_reader))
+        py::ssize_t num_points_for_this_iter = std::min(num_points_to_read, max_points_before_filling_stream);
+        for (py::ssize_t i = 0; i < num_points_for_this_iter; ++i)
         {
-            throw laszip_error::last_error(m_reader);
-        }
+            if (laszip_read_point(m_reader))
+            {
+                throw laszip_error::last_error(m_reader);
+            }
 
-        if (laszip_set_point(m_writer, m_point))
-        {
-            throw laszip_error::last_error(m_writer);
-        }
+            if (laszip_set_point(m_writer, m_point))
+            {
+                throw laszip_error::last_error(m_writer);
+            }
 
-        if (laszip_write_point(m_writer))
-        {
-            throw laszip_error::last_error(m_writer);
+            if (laszip_write_point(m_writer))
+            {
+                throw laszip_error::last_error(m_writer);
+            }
         }
+        num_points_to_read -= num_points_for_this_iter;
+        size_t bytes_read =
+            num_points_for_this_iter * static_cast<size_t>(m_header->point_data_record_length);
+
+        m_output_stream.read(out_ptr, bytes_read);
+        m_output_stream.seekg(0, std::ios_base::beg);
+        m_output_stream.seekp(0, std::ios_base::beg);
+        out_ptr += bytes_read;
     }
-    m_output_stream.read(static_cast<char *>(buf_info.ptr), buf_info.size);
-    m_output_stream.seekg(0, std::ios_base::beg);
-    m_output_stream.seekp(0, std::ios_base::beg);
 }
 
 void LasUnZipper::close()
