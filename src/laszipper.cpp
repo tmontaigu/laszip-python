@@ -48,6 +48,11 @@ LasZipper::LasZipper(py::object &file_obj, py::bytes &header_bytes)
 
 size_t LasZipper::compress(py::buffer &buffer)
 {
+    if (m_header->point_data_record_length == 0)
+    {
+        return 0;
+    }
+
     py::buffer_info buf_info = buffer.request();
 
     if (buf_info.itemsize != sizeof(char))
@@ -60,36 +65,54 @@ size_t LasZipper::compress(py::buffer &buffer)
         throw std::invalid_argument("Buffer must be one dimensional");
     }
 
-    m_is.write(static_cast<const char *>(buf_info.ptr), buf_info.size);
+    size_t num_points_in_buffer = buf_info.size / m_header->point_data_record_length;
+    size_t max_bytes_in_stream = std::numeric_limits<std::stringstream::int_type>::max();
+    size_t max_points_before_filling_stream =
+        max_bytes_in_stream / static_cast<size_t>(m_header->point_data_record_length);
+    std::cout << "points in buffer: " << num_points_in_buffer << '\n';
+    std::cout << "max_bytes_in_stream: " << max_bytes_in_stream << '\n';
+    std::cout << "max_points_in_stream: " << max_points_before_filling_stream << '\n';
 
-    size_t num_points = buf_info.size / m_header->point_data_record_length;
-
-    for (size_t i{0}; i < num_points; ++i)
+    auto *in_ptr = static_cast<char *>(buf_info.ptr);
+    while (num_points_in_buffer != 0)
     {
-        if (laszip_read_point(m_reader))
+        m_is.seekp(0);
+        m_is.seekg(0);
+
+        py::ssize_t num_points_for_this_iter =
+            std::min(num_points_in_buffer, max_points_before_filling_stream);
+        size_t num_bytes_for_this_iter =
+            num_points_for_this_iter * static_cast<size_t>(m_header->point_data_record_length);
+        m_is.write(in_ptr, num_bytes_for_this_iter);
+
+        for (size_t i{0}; i < num_points_for_this_iter; ++i)
         {
-            throw laszip_error::last_error(m_reader);
+            if (laszip_read_point(m_reader))
+            {
+                throw laszip_error::last_error(m_reader);
+            }
+
+            if (laszip_set_point(m_writer, m_point))
+            {
+                throw laszip_error::last_error(m_writer);
+            }
+
+            if (laszip_update_inventory(m_writer))
+            {
+                throw laszip_error::last_error(m_writer);
+            }
+
+            if (laszip_write_point(m_writer))
+            {
+                throw laszip_error::last_error(m_writer);
+            }
         }
 
-        if (laszip_set_point(m_writer, m_point))
-        {
-            throw laszip_error::last_error(m_writer);
-        }
-
-        if (laszip_update_inventory(m_writer))
-        {
-            throw laszip_error::last_error(m_writer);
-        }
-
-        if (laszip_write_point(m_writer))
-        {
-            throw laszip_error::last_error(m_writer);
-        }
+        in_ptr += num_points_for_this_iter;
+        num_points_in_buffer -= num_points_for_this_iter;
     }
 
-    m_is.seekp(0);
-    m_is.seekg(0);
-    return num_points;
+    return num_points_in_buffer;
 }
 
 void LasZipper::done()
