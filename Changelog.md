@@ -1,3 +1,9 @@
+# 0.2.3 30 May 2023
+
+- Fix LasUnZipper::decompress and LasZipper::compress when the number
+  of bytes to compress/decompress exceeded the mac capacity of the
+  inner stringstream used.
+
 # 0.2.2 8 Feb 2023
 
 - Added missing MIT License
