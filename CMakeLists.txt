@@ -5,6 +5,12 @@ set(CMAKE_CXX_STANDARD 14)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
+if(NOT SKBUILD)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/PythonEnvHelper.cmake)
+    set_python_executable_from_current_venv()
+    ensure_pybind11_cmake_module_is_in_path()
+endif()
+
 find_package(pybind11)
 find_package(LASzip MODULE REQUIRED)
 
