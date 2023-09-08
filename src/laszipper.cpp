@@ -2,6 +2,8 @@
 
 #include "laszip_error.h"
 
+#include <limits>
+
 LasZipper::LasZipper(py::object &file_obj, py::bytes &header_bytes)
     : m_is(), m_b(file_obj), m_output_stream(&m_b)
 {

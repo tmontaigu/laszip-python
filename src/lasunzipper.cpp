@@ -3,6 +3,7 @@
 #include <laszip/laszip_api.h>
 
 #include <algorithm>
+#include <limits>
 
 LasUnZipper::LasUnZipper(py::object &file_obj) : LasUnZipper(file_obj, laszip_DECOMPRESS_SELECTIVE_ALL) {}
 
