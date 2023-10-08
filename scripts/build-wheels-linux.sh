@@ -10,10 +10,14 @@ function install_laszip() {
 }
 
 function compile_wheels() {
-  for PYBIN in /opt/python/*/bin; do
-    is_greater_or_eq_than_3_7=$("${PYBIN}/python" -c 'import sys;v = sys.version_info;print(v.major == 3 and v.minor >= 7)')
+  # -L makes find follow symlinks, which
+  # is what folders we are looking python in are
+  pybins=$(find -L /opt/python -regex '.*\/bin\/python3.[0-9]+$')
+  for pybin in $pybins; do
+    is_greater_or_eq_than_3_7=$("${pybin}" -c 'import sys;v = sys.version_info;print(v.major == 3 and v.minor >= 7)')
+    echo "Considering $pybin -> >= 3.7 ? $is_greater_or_eq_than_3_7"
     if [[ "$is_greater_or_eq_than_3_7" == "True" ]]; then
-        "${PYBIN}/pip" wheel --no-deps . -w wheelhouse
+        "${pybin}" -m pip wheel --no-deps . -w wheelhouse
     fi
   done
 }
@@ -30,6 +34,7 @@ function repair_wheel() {
 function repair_wheels() {
   for wheel in wheelhouse/*.whl; do
     repair_wheel "$wheel"
+    rm "$wheel" # Remove non repaired wheel
   done
 }
 
