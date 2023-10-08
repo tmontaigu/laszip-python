@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Build Wheel
         run: docker run --rm -v `pwd`:/laszip-python -e PLAT=manylinux2014_x86_64 quay.io/pypa/manylinux2014_x86_64 /bin/sh /laszip-python/scripts/build-wheels-linux.sh
@@ -31,16 +31,16 @@ jobs:
 
     steps:
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v3
 
       - name: Build Wheel
         run: docker run --rm -v `pwd`:/laszip-python --platform linux/arm64 -e PLAT=manylinux2014_aarch64 quay.io/pypa/manylinux2014_aarch64 /bin/sh /laszip-python/scripts/build-wheels-linux.sh
 
       - name: Upload wheels as artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: "manylinux-arm64-wheels"
           path: "./wheelhouse/*manylinux*.whl"
@@ -53,10 +53,10 @@ jobs:
 
     steps:
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -88,7 +88,7 @@ jobs:
           python${{ matrix.python-version }} -c "import laszip"
 
       - name: Upload wheel as artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: "macOs-python${{ matrix.python-version }}"
           path: "./dist/*.whl"
@@ -101,10 +101,10 @@ jobs:
 
     steps:
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -133,7 +133,7 @@ jobs:
           py -${{ matrix.python-version }} -c "import laszip"
 
       - name: Upload wheel as artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: "windows-python${{ matrix.python-version }}"
           path: "./dist/*.whl"
