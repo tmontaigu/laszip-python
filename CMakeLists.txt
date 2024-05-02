@@ -12,9 +12,12 @@ if(NOT SKBUILD)
 endif()
 
 find_package(pybind11)
-find_package(LASzip MODULE REQUIRED)
+#find_package(LASzip MODULE REQUIRED)
 
-pybind11_add_module(laszip
+set(LASZIP_VENDOR "LASzip-3.4.4")
+add_subdirectory(src/vendor/${LASZIP_VENDOR})
+
+pybind11_add_module(laszip-python
         src/laszip.cpp
         src/laszip_error.h
         src/lasunzipper.h
@@ -24,9 +27,13 @@ pybind11_add_module(laszip
         src/python_istreambuf.h
         src/python_ostreambuf.h)
 
-target_link_libraries(laszip PRIVATE LASzip::LASzip)
+target_include_directories(laszip-python
+        PRIVATE
+            src/vendor/${LASZIP_VENDOR}/dll)
+target_link_libraries(laszip-python PRIVATE laszip)
+#add_dependencies(laszip-python laszip)
 
-install(TARGETS laszip DESTINATION laszip)
+install(TARGETS laszip-python DESTINATION laszip)
 if (WIN32)
     install(FILES ${LASZIP_DLL} DESTINATION laszip)
 endif()

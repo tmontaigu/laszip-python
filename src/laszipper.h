@@ -6,7 +6,7 @@
 #include <pybind11/pybind11.h>
 
 #include "python_ostreambuf.h"
-#include <laszip/laszip_api.h>
+#include <laszip_api.h>
 namespace py = pybind11;
 
 class LasZipper

@@ -1,7 +1,7 @@
 #ifndef LASZIP_BIND_LASZIP_ERROR_H
 #define LASZIP_BIND_LASZIP_ERROR_H
 
-#include <laszip/laszip_api.h>
+#include <laszip_api.h>
 
 class laszip_error : public std::runtime_error
 {
