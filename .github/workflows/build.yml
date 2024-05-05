@@ -87,7 +87,7 @@ jobs:
 
   pypi-publish:
     needs: [wheels, wheels_aarch64]
-    name: Upload release to PyPI
+    name: Gather wheels and publish release to PyPI
     runs-on: ubuntu-latest
     environment:
       name: release
