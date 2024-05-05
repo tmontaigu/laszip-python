@@ -74,6 +74,8 @@ macro(LASZIP_ADD_LIBRARY _name)
         set_target_properties(${_name} PROPERTIES INSTALL_NAME_DIR
             "@executable_path/../lib")
     endif()
+    set_target_properties(${_name} PROPERTIES
+        POSITION_INDEPENDENT_CODE TRUE)
 endmacro(LASZIP_ADD_LIBRARY)
 
 ###############################################################################
