@@ -86,7 +86,7 @@ jobs:
         path: wheelhouse/*.whl
 
   pypi-publish:
-    needs: wheels
+    needs: [wheels, wheels_aarch64]
     name: Upload release to PyPI
     runs-on: ubuntu-latest
     environment:
