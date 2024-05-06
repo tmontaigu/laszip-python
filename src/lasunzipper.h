@@ -5,7 +5,7 @@
 
 #include <pybind11/pybind11.h>
 
-#include <laszip/laszip_api.h>
+#include <laszip_api.h>
 
 #include <sstream>
 

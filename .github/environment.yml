@@ -1,0 +1,8 @@
+name: testenv
+channels:
+  - conda-forge
+dependencies:
+  - scikit-build-core
+  - compilers
+  - pybind11
+  - pytest

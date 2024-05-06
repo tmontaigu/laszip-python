@@ -1,6 +1,6 @@
 #include "lasunzipper.h"
 #include "laszip_error.h"
-#include <laszip/laszip_api.h>
+#include <laszip_api.h>
 
 #include <algorithm>
 #include <limits>
