@@ -1,7 +1,11 @@
 #ifndef LASZIP_BIND_LASZIP_ERROR_H
 #define LASZIP_BIND_LASZIP_ERROR_H
 
+#ifdef USE_VENDORED_LASZIP
 #include <laszip_api.h>
+#else
+#include <laszip/laszip_api.h>
+#endif
 
 class laszip_error : public std::runtime_error
 {
