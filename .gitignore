@@ -11,3 +11,4 @@ dist
 *.laz
 
 __pycache__/
+venv

@@ -7,7 +7,11 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
+#ifdef USE_VENDORED_LASZIP
 #include <laszip_api.h>
+#else
+#include <laszip/laszip_api.h>
+#endif
 
 #include <utility>
 
