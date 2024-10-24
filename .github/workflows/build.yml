@@ -49,7 +49,7 @@ jobs:
     - name: Build wheels
       run: |
         python3 -m cibuildwheel --output-dir wheelhouse
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.os }}-whl
         path: wheelhouse/*.whl
@@ -59,10 +59,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python_tag: [ "cp37-*", "cp38-*", "cp39-*", "cp310-*", "cp311-*", "cp312-*"]
+        python_tag: [ "cp37", "cp38", "cp39", "cp310", "cp311", "cp312"]
     env:
       CIBW_ARCHS_LINUX: aarch64
-      CIBW_BUILD: ${{matrix.python_tag}}
+      CIBW_BUILD: ${{matrix.python_tag}}-*
       CIBW_TEST_REQUIRES: pytest numpy
       CIBW_TEST_COMMAND: "python -c 'import laszip'"
 
@@ -80,9 +80,9 @@ jobs:
     - name: Build wheels
       run: |
         python -m cibuildwheel --output-dir wheelhouse
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
-        name: aarch64-whl
+        name: aarch64-${{matrix.python_tag}}-whl
         path: wheelhouse/*.whl
 
   pypi-publish:
@@ -111,7 +111,7 @@ jobs:
         pipx run build --sdist
 
     - name: Download artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
           path: dist
 
