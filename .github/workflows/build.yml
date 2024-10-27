@@ -36,19 +36,23 @@ jobs:
         os: [windows-latest, ubuntu-latest, macos-latest]
     steps:
     - uses: actions/checkout@v4
+
     - uses: actions/setup-python@v5
       name: Install Python
       with:
         python-version: '3.12'
+
     - name: Install cibuildwheel
       run: |
-        python -m pip install cibuildwheel==2.17.0
+        python -m pip install cibuildwheel==2.21
+
     - uses: ilammy/msvc-dev-cmd@v1
       if: startsWith(matrix.os, 'windows')
 
     - name: Build wheels
       run: |
         python3 -m cibuildwheel --output-dir wheelhouse
+        
     - uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.os }}-whl
@@ -59,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python_tag: [ "cp39", "cp310", "cp311", "cp312"]
+        python_tag: [ "cp39", "cp310", "cp311", "cp312", "cp313"]
     env:
       CIBW_ARCHS_LINUX: aarch64
       CIBW_BUILD: ${{matrix.python_tag}}-*
@@ -68,18 +72,23 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
     - uses: actions/setup-python@v4
       name: Install Python
       with:
         python-version: '3.11'
+
     - name: Install cibuildwheel
       run: |
-        python -m pip install cibuildwheel==2.17.0
+        python -m pip install cibuildwheel==2.21.0
+
     - uses: docker/setup-qemu-action@v2
       name: Set up QEMU
+
     - name: Build wheels
       run: |
         python -m cibuildwheel --output-dir wheelhouse
+
     - uses: actions/upload-artifact@v4
       with:
         name: aarch64-${{matrix.python_tag}}-whl
