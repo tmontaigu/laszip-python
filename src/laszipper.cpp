@@ -76,13 +76,14 @@ size_t LasZipper::compress(py::buffer &buffer)
     while (num_points_in_buffer != 0)
     {
         m_is.seekp(0);
-        m_is.seekg(0);
 
         py::ssize_t num_points_for_this_iter =
             std::min(num_points_in_buffer, max_points_before_filling_stream);
         size_t num_bytes_for_this_iter =
             num_points_for_this_iter * static_cast<size_t>(m_header->point_data_record_length);
         m_is.write(in_ptr, num_bytes_for_this_iter);
+
+        m_is.seekg(0);
 
         for (size_t i{0}; i < num_points_for_this_iter; ++i)
         {
@@ -107,7 +108,7 @@ size_t LasZipper::compress(py::buffer &buffer)
             }
         }
 
-        in_ptr += num_points_for_this_iter;
+        in_ptr += num_bytes_for_this_iter;
         num_points_in_buffer -= num_points_for_this_iter;
     }
 
