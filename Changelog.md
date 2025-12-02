@@ -1,3 +1,7 @@
+# 0.2.4 02 Dec 2025
+
+- Fix LasZipper's handling of big files
+
 # 0.2.3 30 May 2023
 
 - Fix LasUnZipper::decompress and LasZipper::compress when the number
@@ -28,3 +32,4 @@
 - Added LasZipDll
 - Added bindings to laszip_header
 - Added bindings to laszip_point
+
