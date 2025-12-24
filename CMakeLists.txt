@@ -17,13 +17,15 @@ option(USE_VENDORED_LASZIP "Build by building and linking to the vendored LASZip
 
 if (USE_VENDORED_LASZIP)
     option(LASZIP_BUILD_STATIC "Build LASZip as static lib" ON)
-    set(LASZIP_VENDOR "LASzip-3.4.4")
-    add_subdirectory(src/vendor/${LASZIP_VENDOR})
+    set(LASZIP_VENDOR "LASzip-4f39c23907bb92cc583aa95bb2ace2ca4f6efdbe")
+    add_subdirectory(src/vendor/${LASZIP_VENDOR} EXCLUDE_FROM_ALL)
 else()
     find_package(LASzip MODULE REQUIRED)
 endif()
 
-pybind11_add_module(laszip
+set(PY_MODULE_NAME laszip_core)
+
+pybind11_add_module(${PY_MODULE_NAME}
         src/laszip.cpp
         src/laszip_error.h
         src/lasunzipper.h
@@ -34,21 +36,29 @@ pybind11_add_module(laszip
         src/python_ostreambuf.h)
 
 if (USE_VENDORED_LASZIP)
-    target_compile_definitions(laszip PRIVATE USE_VENDORED_LASZIP)
-    target_include_directories(laszip
+    target_compile_definitions(${PY_MODULE_NAME} PRIVATE USE_VENDORED_LASZIP)
+    target_include_directories(${PY_MODULE_NAME}
         PRIVATE
         src/vendor/${LASZIP_VENDOR}/dll
+        src/vendor/${LASZIP_VENDOR}/include/laszip
     )
-    target_link_libraries(laszip PRIVATE  laszip_base)
-    set_target_properties(laszip
+    if (WIN32)
+      target_link_libraries(${PY_MODULE_NAME} PRIVATE  laszip3)
+    else()
+      set_target_properties(laszip PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+      target_link_libraries(${PY_MODULE_NAME} PRIVATE  laszip)
+    endif()
+
+    set_target_properties(${PY_MODULE_NAME}
         PROPERTIES
         POSITION_INDEPENDENT_CODE TRUE
     )
 else()
-    target_link_libraries(laszip PRIVATE LASzip::LASzip)
+    target_link_libraries(${PY_MODULE_NAME} PRIVATE LASzip::LASzip)
 endif()
 
-install(TARGETS laszip DESTINATION laszip)
+install(TARGETS ${PY_MODULE_NAME} DESTINATION laszip)
 if (WIN32)
     install(FILES ${LASZIP_DLL} DESTINATION laszip)
 endif()
+

@@ -223,7 +223,7 @@ class LasZipDll
     std::unique_ptr<std::ostream> m_outputStream{nullptr};
 };
 
-PYBIND11_MODULE(laszip, m)
+PYBIND11_MODULE(laszip_core, m)
 {
     py::register_exception<laszip_error>(m, "LaszipError");
 
@@ -268,8 +268,8 @@ PYBIND11_MODULE(laszip, m)
 
     py::class_<LasZipDll>(m, "LasZipDll")
         .def(py::init<>())
-        .def("open_reader", (bool (LasZipDll::*)(const char *))(&LasZipDll::open_reader))
-        .def("open_reader", (bool (LasZipDll::*)(py::object &))(&LasZipDll::open_reader))
+        .def("open_reader", (bool(LasZipDll::*)(const char *))(&LasZipDll::open_reader))
+        .def("open_reader", (bool(LasZipDll::*)(py::object &))(&LasZipDll::open_reader))
         .def("header", &LasZipDll::header, py::return_value_policy::reference)
         .def("point", &LasZipDll::point, py::return_value_policy::reference)
         .def("read_point", &LasZipDll::read_point)
@@ -292,7 +292,8 @@ PYBIND11_MODULE(laszip, m)
         .def_property(
             "project_ID_GUID_data_4",
             [](const laszip_header &header) { return py::str(header.project_ID_GUID_data_4, 8); },
-            [](laszip_header &header, const std::string &new_value) {
+            [](laszip_header &header, const std::string &new_value)
+            {
                 if (new_value.size() != 8)
                 {
                     throw std::invalid_argument("project_ID_GUID_data_4 must be 8 bytes long");
@@ -304,7 +305,8 @@ PYBIND11_MODULE(laszip, m)
         .def_property(
             "system_identifier",
             [](const laszip_header &header) { return py::str(header.system_identifier, 32); },
-            [](laszip_header &header, const std::string &new_value) {
+            [](laszip_header &header, const std::string &new_value)
+            {
                 if (new_value.size() > 32)
                 {
                     throw std::invalid_argument("system_identifier cannot exceed 32 bytes");
@@ -315,7 +317,8 @@ PYBIND11_MODULE(laszip, m)
         .def_property(
             "generating_software",
             [](const laszip_header &header) { return py::str(header.generating_software, 32); },
-            [](laszip_header &header, const std::string &new_value) {
+            [](laszip_header &header, const std::string &new_value)
+            {
                 if (new_value.size() > 32)
                 {
                     throw std::invalid_argument("generating_software cannot exceed 32 bytes");
@@ -332,9 +335,8 @@ PYBIND11_MODULE(laszip, m)
         .def_readwrite("point_data_record_length", &laszip_header::point_data_record_length)
         .def_readwrite("number_of_point_records", &laszip_header::number_of_point_records)
         .def_property_readonly("number_of_points_by_return",
-                               [](const laszip_header &header) {
-                                   return wrap_as_py_array(header.number_of_points_by_return, 5);
-                               })
+                               [](const laszip_header &header)
+                               { return wrap_as_py_array(header.number_of_points_by_return, 5); })
         .def_readwrite("x_scale_factor", &laszip_header::x_scale_factor)
         .def_readwrite("y_scale_factor", &laszip_header::y_scale_factor)
         .def_readwrite("z_scale_factor", &laszip_header::z_scale_factor)
@@ -356,9 +358,9 @@ PYBIND11_MODULE(laszip, m)
         .def_readwrite("number_of_extended_variable_length_records",
                        &laszip_header::number_of_extended_variable_length_records)
         .def_readwrite("extended_number_of_point_records", &laszip_header::extended_number_of_point_records)
-        .def_property_readonly("extended_number_of_points_by_return", [](const laszip_header &header) {
-            return wrap_as_py_array(header.extended_number_of_points_by_return, 15);
-        });
+        .def_property_readonly("extended_number_of_points_by_return",
+                               [](const laszip_header &header)
+                               { return wrap_as_py_array(header.extended_number_of_points_by_return, 15); });
 
     py::class_<laszip_point>(m, "LasZipPoint")
         .def(py::init<>())
@@ -431,17 +433,19 @@ PYBIND11_MODULE(laszip, m)
                                [](const laszip_point &point) { return wrap_as_py_array(point.rgb, 4); })
         .def_property_readonly(
             "wave_packet", [](const laszip_point &point) { return wrap_as_py_array(point.wave_packet, 4); })
-        .def_property_readonly("extra_bytes", [](const laszip_point &point) {
-            return wrap_as_py_array(point.extra_bytes, point.num_extra_bytes);
-        });
+        .def_property_readonly("extra_bytes",
+                               [](const laszip_point &point)
+                               { return wrap_as_py_array(point.extra_bytes, point.num_extra_bytes); });
 
-    m.def("get_version", []() {
-        laszip_U8 major{0}, minor{0};
-        laszip_U16 revision{0};
-        laszip_U32 build{0};
+    m.def("get_version",
+          []()
+          {
+              laszip_U8 major{0}, minor{0};
+              laszip_U16 revision{0};
+              laszip_U32 build{0};
 
-        laszip_get_version(&major, &minor, &revision, &build);
+              laszip_get_version(&major, &minor, &revision, &build);
 
-        return py::make_tuple(major, minor, revision, build);
-    });
+              return py::make_tuple(major, minor, revision, build);
+          });
 }

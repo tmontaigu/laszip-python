@@ -1,1 +1,1 @@
-from .laszip import *
+from .laszip_core import *
