@@ -1,3 +1,8 @@
+# 0.3.0 30 Dec 2025
+
+- Bump vendored LASzip version to support las 1.5
+- Bump pybind11 to 3.0 (pybind11 2.x) should still be ok
+
 # 0.2.4 02 Dec 2025
 
 - Fix LasZipper's handling of big files
@@ -32,4 +37,3 @@
 - Added LasZipDll
 - Added bindings to laszip_header
 - Added bindings to laszip_point
-

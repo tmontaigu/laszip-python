@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "laszip"
-version = "0.2.4"
+version = "0.3.0"
 description = "Bindings for LASzip made with pybind11"
 readme = "Readme.md"
 authors = [{ name = "Thomas Montaigu", email = "thomas.montaigu@laposte.net" }]
